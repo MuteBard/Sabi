@@ -35,9 +35,9 @@ function runDiscord() {
 				message,
 				commands.HEY_SABI.url
 			);
-			const botResponse = await chatEvent(emitterData);
+			const botResponseParts = await chatEvent(emitterData);
 			loadingMessage.delete();
-			message.reply(botResponse);
+			botResponseParts.map((part) => message.reply(part))
 		}
 
 		if (strictCheckCommand(message, commands.CLEAR_SABI.name)) {

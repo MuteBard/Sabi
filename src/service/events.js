@@ -1,6 +1,7 @@
 const schedule = require("../util/cronManager");
 const { createKey } = require("../redis/redisClient");
 const { encodeToken } = require("../util/jwt");
+const textSplit = require("../util/textSplit");
 const { chatGPT } = require("../../settings");
 const { get, post, buildHeaders } = require("../axios/axiosClient");
 
@@ -39,7 +40,6 @@ async function clearEvent(emitterData) {
 
 async function chatEvent(emitterData) {
 	const { eventName, message, url } = emitterData;
-	let botResponse = null;
 	const text = message.content;
 	const pattern = /(?:hey\s*sabi[.,!?]?)[\s]*(.*)/i; // 'i' for case-insensitive matching
 
@@ -65,9 +65,10 @@ async function chatEvent(emitterData) {
 		];
 
 		const size = greetings.length;
-		botResponse = greetings[Math.floor(Math.random() * (size))];
-		
-		return botResponse;
+		const botResponse = greetings[Math.floor(Math.random() * (size))];
+		const updatedBotResponseParts = textSplit(botResponse);
+	
+		return updatedBotResponseParts;
 	}
 
 	const key = createKey(
@@ -93,9 +94,10 @@ async function chatEvent(emitterData) {
 	const jwtToken = encodeToken(jwtBody, chatGPT.chat_secret);
 	const headers = buildHeaders(jwtToken);
 	const response = await post(url, requestBody, headers);
-	botResponse = response.data.response;
+	const botResponse = response.data.response;
+	const updatedBotResponseParts = textSplit(botResponse);
 
-	return botResponse;
+	return updatedBotResponseParts;
 }
 
 module.exports = {
