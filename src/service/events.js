@@ -84,6 +84,7 @@ async function chatEvent(emitterData) {
 		key,
 		timeStamp: message.createdTimestamp,
 	};
+	console.log("JWT created");
 
 	const requestBody = {
 		key,
@@ -94,6 +95,9 @@ async function chatEvent(emitterData) {
 	const jwtToken = encodeToken(jwtBody, chatGPT.chat_secret);
 	const headers = buildHeaders(jwtToken);
 	const response = await post(url, requestBody, headers);
+	if (response.data){
+		console.log("Response received");
+	}
 	const botResponse = response.data.response;
 	const updatedBotResponseParts = textSplit(botResponse);
 
