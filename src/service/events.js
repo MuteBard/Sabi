@@ -40,7 +40,7 @@ async function clearEvent(emitterData) {
 
 async function chatEvent(emitterData) {
 	const { eventName, message, url } = emitterData;
-	const text = message.content;
+	const text = message.content.split('\n').join(""); // the match may not work against the pattern as expected after this but i cant spend too much time on this, this however solves the inability to read code snippets
 	const pattern = /(?:hey\s*sabi[.,!?]?)[\s]*(.*)/i; // 'i' for case-insensitive matching
 
 	const match = text.match(pattern);
@@ -84,7 +84,6 @@ async function chatEvent(emitterData) {
 		key,
 		timeStamp: message.createdTimestamp,
 	};
-	console.log("JWT created");
 
 	const requestBody = {
 		key,
@@ -95,12 +94,9 @@ async function chatEvent(emitterData) {
 	const jwtToken = encodeToken(jwtBody, chatGPT.chat_secret);
 	const headers = buildHeaders(jwtToken);
 	const response = await post(url, requestBody, headers);
-	if (response.data){
-		console.log("Response received");
-	}
 	const botResponse = response.data.response;
 	const updatedBotResponseParts = textSplit(botResponse);
-
+	
 	return updatedBotResponseParts;
 }
 

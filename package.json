@@ -9,6 +9,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:local": "serverless offline",
+    "local": "clear && nodemon -r ./env/initializeEnvs.js index.js local",
     "dev": "clear && nodemon -r ./env/initializeEnvs.js index.js dev"
   },
   "keywords": [],
