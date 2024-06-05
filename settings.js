@@ -10,6 +10,7 @@ exports.discord = {
 	server_id: ENV["DISCORD_SERVER_ID"],
 	channel_id: ENV["DISCORD_CHANNEL_ID"],
 	token: ENV["DISCORD_TOKEN"],
+	display_message: ENV["DISCORD_DISPLAY_MESSAGE"]
 };
 
 exports.redis = {
