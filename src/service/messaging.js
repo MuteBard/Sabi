@@ -1,17 +1,22 @@
 const client = require("../discord/discordClient");
-const { redis } = require("../redis/redisClient");
-const { alexaEvent, chatEvent, clearEvent } = require("./events");
+const { chatEvent, clearEvent } = require("./events");
 const events = require("../util/eventNames");
-const { commands, checkCommand, strictCheckCommand} = require("../util/commands");
-const { discord } = require('../../settings')
+const {
+	commands,
+	checkCommand,
+	strictCheckCommand,
+} = require("../util/commands");
+const { discord } = require("../../settings");
 const { gifs } = require("../service/imagelinks");
 
-function createEmitterData(eventName, message, url) {
+function createEmitterData(eventName, message, url, context, assistant) {
 	return {
 		client,
 		message,
 		eventName,
 		url,
+		context,
+		assistant,
 	};
 }
 
@@ -33,11 +38,29 @@ function runDiscord() {
 			emitterData = createEmitterData(
 				events.CHAT_GPT,
 				message,
-				commands.HEY_SABI.url
+				commands.HEY_SABI.url,
+				commands.HEY_SABI.context,
+				commands.HEY_SABI.name
 			);
 			const botResponseParts = await chatEvent(emitterData);
 			loadingMessage.delete();
-			botResponseParts.map((part) => message.reply(part))
+			botResponseParts.map((part) => message.reply(part));
+		}
+
+		if (checkCommand(message, commands.HEY_SLOBBI.name)) {
+			let loadingMessage = await message.channel.send(gifs.bouncebar);
+
+			emitterData = createEmitterData(
+				events.CHAT_GPT,
+				message,
+				commands.HEY_SLOBBI.url,
+				commands.HEY_SLOBBI.context,
+				commands.HEY_SLOBBI.name
+			);
+
+			const botResponseParts = await chatEvent(emitterData);
+			loadingMessage.delete();
+			botResponseParts.map((part) => message.reply(part));
 		}
 
 		if (strictCheckCommand(message, commands.CLEAR_SABI.name)) {
@@ -54,35 +77,7 @@ function runDiscord() {
 			message.reply(botResponse);
 		}
 
-		// if (message.content.toLowerCase() === "!alexa_G") {
-		// 	emitterData = createEmitterData(events.ALEXA_GENERAL, message);
-		// 	// alexaEvent(emitterData);
-		// }
-
-		// if (message.content.toLowerCase() === "!set") {
-		// 	message.reply("redis set abc");
-		// }
-
-		// if (message.content.toLowerCase() === "!get") {
-		// 	const data = await redis.get("abc");
-		// 	message.reply(`redis get ${events.ALEXA_GENERAL} ${data}`);
-		// }
 	});
-
-	// client.on(events.NOTICE, async ({ message, text }) => {
-	// 	await redis.set(events.NOTICE, null);
-	// 	message.reply(text);
-	// });
-
-	// client.on(events.ALEXA_EMERGENCY, async ({ message, text }) => {
-	// 	await redis.set(events.ALEXA_EMERGENCY, null);
-	// 	message.reply(text);
-	// });
-
-	// client.on(events.ALEXA_GENERAL, async ({ message, text }) => {
-	// 	await redis.set(events.ALEXA_GENERAL, null);
-	// 	message.reply(text);
-	// });
 
 
 }
